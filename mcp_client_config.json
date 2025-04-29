@@ -2,12 +2,9 @@
   "weather_forecast": {
     "command": "python",
     "args": [
-      "weather_mcp_server.py"
-    ],
-    "env": {
-      "OPENWEATHER_API_KEY": "your_openweathermap_api_key_here"
-    },
-    "disabled": false,
-    "autoApprove": ["get_weather", "get_current_weather"]
+      "weather_mcp_server.py",
+      "--api-key",
+      "your_openweathermap_api_key_here"
+    ]
   }
-} 
+}

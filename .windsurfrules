@@ -1,0 +1,2 @@
+- this is a simple python mcp server that reports weather via the open weather api adapted from https://github.com/Zippland/weather-mcp
+- since is not clear if python or uvx gives the smoother install experience, we try to support both
