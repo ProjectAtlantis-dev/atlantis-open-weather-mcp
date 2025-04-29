@@ -6,6 +6,8 @@ import requests
 from datetime import datetime, timedelta, timezone
 import os
 import argparse
+import signal
+import sys
 
 # Create MCP server instance
 mcp = FastMCP(
@@ -172,7 +174,7 @@ def get_weather_forecast(present_location, time_zone_offset, api_key=None, cli_k
 
 # Define MCP tools
 # We capture the cli_api_key from the main scope if it exists
-cli_api_key_global = None
+cli_key_global = None
 
 @mcp.tool()
 def get_weather(location: str, api_key: Optional[str] = None, timezone_offset: float = 0) -> Dict[str, Any]:
@@ -188,7 +190,7 @@ def get_weather(location: str, api_key: Optional[str] = None, timezone_offset: f
         Dictionary containing today's and tomorrow's weather forecast
     """
     # Call weather forecast function, passing the globally stored CLI key
-    return get_weather_forecast(location, timezone_offset, api_key, cli_key_global)
+    return get_weather_forecast(location, timezone_offset, api_key, cli_key_global) # type: ignore
 
 @mcp.tool()
 def get_current_weather(location: str, api_key: Optional[str] = None, timezone_offset: float = 0) -> Dict[str, Any]:
@@ -216,19 +218,26 @@ def get_current_weather(location: str, api_key: Optional[str] = None, timezone_o
     else:
         return {"error": "Unable to get current weather information"}
 
-# Start server
-if __name__ == "__main__":
-# ----- PASTE THIS CODE AT THE END OF THE FILE -----
 
 # Define the main execution function
 def main():
+    # --- Signal Handler Setup ---
+    def handle_sigint(signum, frame):
+        print("\nCtrl+C detected. Shutting down server...")
+        # In a more complex server, you might call mcp.stop() or similar here
+        # For stdio transport, exiting the process is usually sufficient
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, handle_sigint)
+    # ---------------------------
+
     parser = argparse.ArgumentParser(description="Weather MCP Server")
     parser.add_argument('--api-key', type=str, help='OpenWeatherMap API Key')
     args = parser.parse_args()
 
     # Store CLI key globally for tool functions to access if needed
-    global cli_api_key_global  # Ensure we modify the global variable
-    cli_api_key_global = args.api_key
+    global cli_key_global  # Ensure we modify the global variable
+    cli_key_global = args.api_key
 
     # Check if API key is available from CLI or ENV
     api_key_available = False
@@ -242,6 +251,21 @@ def main():
         print("ERROR: No API key provided via --api-key or environment variable OPENWEATHER_API_KEY.")
         print("Please provide the key using either method.")
         exit(1) # Exit if no key is available on startup
+
+    # Fetch and print weather for Nuuk, Greenland on startup
+    print("\nFetching startup weather for Nuuk, Greenland...")
+    try:
+        # Call get_current_weather, it will use cli_key_global or ENV var internally
+        startup_weather = get_current_weather(location="Nuuk, Greenland", timezone_offset=-2) # Nuuk is UTC-2
+        if 'error' in startup_weather:
+            print(f"ERROR fetching startup weather: {startup_weather['error']}")
+        else:
+            # Pretty print the result if successful
+            import json
+            print(f"Current weather in Nuuk:\n{json.dumps(startup_weather, indent=2)}")
+    except Exception as e:
+        print(f"An unexpected error occurred during startup weather fetch: {e}")
+    print("\nStarting MCP server...")
 
     print("Weather Forecast MCP Server running...")
     mcp.run(transport='stdio')
