@@ -59,16 +59,18 @@ Add the following configuration to your MCP-supported client:
 
 ```json
 {
-  "weather_forecast": {
-    "command": "python",
-    "args": [
-      "/full_path/weather_mcp_server.py"
-    ],
-    "env": {
-      "OPENWEATHER_API_KEY": "your_openweathermap_key_here"
-    },
-    "disabled": false,
-    "autoApprove": ["get_weather", "get_current_weather"]
+  "mcpServers": {
+    "weather_forecast": {
+      "command": "python",
+      "args": [
+        "/full_path/weather_mcp_server.py"
+      ],
+      "env": {
+        "OPENWEATHER_API_KEY": "your_openweathermap_key_here"
+      },
+      "disabled": false,
+      "autoApprove": ["get_weather", "get_current_weather"]
+    }
   }
 }
 ```
@@ -112,4 +114,4 @@ If you encounter a "No API key provided" error, make sure:
 1. You have set the OPENWEATHER_API_KEY in environment variables, or
 2. You are providing the api_key parameter when calling the tools
 
-If the location name is incorrect, you might receive a "Location not found" error. Try using a more accurate city name or add a country code, e.g., "Beijing,CN" or "Paris,FR". 
+If the location name is incorrect, you might receive a "Location not found" error. Try using a more accurate city name or add a country code, e.g., "Beijing,CN" or "Paris,FR".
