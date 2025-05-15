@@ -1,0 +1,22 @@
+{
+  "name": "atlantis-open-weather-mcp",
+  "version": "0.1.0",
+  "description": "Launcher for the Atlantis OpenWeather MCP server (Python)",
+  "bin": {
+    "atlantis-weather": "bin/run-server.js"
+  },
+  "files": [
+    "bin/run-server.js",
+    "src/",
+    "requirements.txt"
+  ],
+  "engines": {
+    "node": ">=14"
+  },
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "weather",
+    "launcher"
+  ]
+}

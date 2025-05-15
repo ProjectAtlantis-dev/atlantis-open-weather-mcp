@@ -1,0 +1,1 @@
+python3 src/atlantis_open_weather_mcp/weather_mcp_server.py --api-key "<your openweather api key>"
