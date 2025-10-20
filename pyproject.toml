@@ -4,13 +4,13 @@ build-backend = "uv_build"
 
 [project]
 name = "atlantis-open-weather-mcp"
-version = "0.1.0"
+version = "0.1.2"
 description = "An MCP server for OpenWeather data using uvx."
 requires-python = ">=3.10"
 dependencies = [
-    "mcp-server>=0.1.4",
-    "modelcontextprotocol",
-    # Add other dependencies like fastapi, requests, etc. here
+    "mcp[cli]>=1.18.0",
+    "requests>=2.32.3",
+    "pydantic>=2.11.3",
 ]
 
 [project.scripts]
