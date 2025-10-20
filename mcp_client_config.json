@@ -1,10 +1,15 @@
 {
-  "weather_forecast": {
-    "command": "python",
-    "args": [
-      "weather_mcp_server.py",
-      "--api-key",
-      "<your openweather api key>"
-    ]
+  "mcpServers": {
+    "weather_forecast": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "atlantis-open-weather-mcp",
+        "start-weather-server"
+      ],
+      "env": {
+        "OPENWEATHER_API_KEY": "<your openweather api key>"
+      }
+    }
   }
 }
