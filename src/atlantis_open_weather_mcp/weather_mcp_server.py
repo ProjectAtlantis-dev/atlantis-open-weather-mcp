@@ -12,8 +12,7 @@ import sys
 # Create MCP server instance
 mcp = FastMCP(
     name="WeatherForecastServer",
-    description="Provides global weather forecasts and current weather conditions",
-    version="1.0.0"
+    instructions="Provides global weather forecasts and current weather conditions"
 )
 
 # Define data models
@@ -221,16 +220,6 @@ def get_current_weather(location: str, api_key: Optional[str] = None, timezone_o
 
 # Define the main execution function
 def main():
-    # --- Signal Handler Setup ---
-    def handle_sigint(signum, frame):
-        print("\nCtrl+C detected. Shutting down server...")
-        # In a more complex server, you might call mcp.stop() or similar here
-        # For stdio transport, exiting the process is usually sufficient
-        sys.exit(0)
-
-    signal.signal(signal.SIGINT, handle_sigint)
-    # ---------------------------
-
     parser = argparse.ArgumentParser(description="Weather MCP Server")
     parser.add_argument('--api-key', type=str, help='OpenWeatherMap API Key')
     args = parser.parse_args()
@@ -242,33 +231,37 @@ def main():
     # Check if API key is available from CLI or ENV
     api_key_available = False
     if args.api_key:
-        print("API key provided via --api-key argument.")
+        print("API key provided via --api-key argument.", file=sys.stderr)
         api_key_available = True
     elif os.environ.get("OPENWEATHER_API_KEY"):
-        print("API key found in OPENWEATHER_API_KEY environment variable.")
+        print("API key found in OPENWEATHER_API_KEY environment variable.", file=sys.stderr)
         api_key_available = True
     else:
-        print("ERROR: No API key provided via --api-key or environment variable OPENWEATHER_API_KEY.")
-        print("Please provide the key using either method.")
-        exit(1) # Exit if no key is available on startup
+        print("ERROR: No API key provided via --api-key or environment variable OPENWEATHER_API_KEY.", file=sys.stderr)
+        print("Please provide the key using either method.", file=sys.stderr)
+        sys.exit(1)
 
     # Fetch and print weather for Nuuk, Greenland on startup
-    print("\nFetching startup weather for Nuuk, Greenland...")
+    print("\nFetching startup weather for Nuuk, Greenland...", file=sys.stderr)
     try:
         # Call get_current_weather, it will use cli_key_global or ENV var internally
         startup_weather = get_current_weather(location="Nuuk, Greenland", timezone_offset=-2) # Nuuk is UTC-2
         if 'error' in startup_weather:
-            print(f"ERROR fetching startup weather: {startup_weather['error']}")
+            print(f"ERROR fetching startup weather: {startup_weather['error']}", file=sys.stderr)
         else:
             # Pretty print the result if successful
             import json
-            print(f"Current weather in Nuuk:\n{json.dumps(startup_weather, indent=2)}")
+            print(f"Current weather in Nuuk:\n{json.dumps(startup_weather, indent=2)}", file=sys.stderr)
     except Exception as e:
-        print(f"An unexpected error occurred during startup weather fetch: {e}")
-    print("\nStarting MCP server...")
+        print(f"An unexpected error occurred during startup weather fetch: {e}", file=sys.stderr)
+    print("\nStarting MCP server...", file=sys.stderr)
+    print("Weather Forecast MCP Server running... (Press Ctrl+C to stop)", file=sys.stderr)
 
-    print("Weather Forecast MCP Server running...")
-    mcp.run(transport='stdio')
+    try:
+        mcp.run(transport='stdio')
+    except KeyboardInterrupt:
+        print("\n\nShutting down server cleanly...", file=sys.stderr)
+        sys.exit(0)
 
 
 # Start server by calling main when the script is run directly
